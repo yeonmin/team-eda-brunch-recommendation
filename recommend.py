@@ -21,7 +21,7 @@ class RecommendCLI():
         metadata = load_metadata(root_path)
         following_rowwise = make_followingdata(root_path)
         predict_data = load_predictdata(root_path, predict_file)
-        predict_following = predict_following(following_rowwise, predict_data)
+        predict_following = make_predict_following(following_rowwise, predict_data)
 
         weekly_table = weekly_magazine_series(read_rowwise, 
                                               metadata, 
