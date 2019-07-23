@@ -3,7 +3,7 @@ import numpy as np
 import os
 from tqdm import tqdm
 import itertools
-import datetime
+from datetime import datetime
 
 def _chainer(s):
     return list(itertools.chain.from_iterable(s))
@@ -16,7 +16,7 @@ def make_readdata(rootpath):
 
     read_df_list = []
     for file in tqdm(file_list):
-        file_path = input_path + file
+        file_path = os.path.join(input_path, file)
         df_temp = pd.read_csv(file_path, header=None, names=['raw'])
         df_temp['from'] = file.split('_')[0]
         df_temp['to'] = file.split('_')[1]
@@ -43,7 +43,7 @@ def make_readdata(rootpath):
 
    
 def load_metadata(rootpath):
-    input_path = rootpath + 'metadata.json' 
+    input_path = os.path.join(rootpath, 'metadata.json')
 
     # 부정확 할 수 있지만 reg_ts 0으로 두는 것보다는 좋을 것 같아서 1970 이전에 쓴글의 reg_ts를 가져옴
     # 물론 article_id가 글의 연재 순서가 아닐 수 있지만 magazine은 거의 연재순서와 일치하고 일반 기사도 향성이 있어서 이렇게 함
@@ -67,7 +67,7 @@ def load_metadata(rootpath):
 
 
 def make_followingdata(rootpath):
-    input_path = rootpath + 'users.json'
+    input_path = os.path.join(rootpath, 'users.json')
     users = pd.read_json(input_path, lines=True)
 
     following_list_count = users['following_list'].map(len)
@@ -79,8 +79,8 @@ def make_followingdata(rootpath):
 
 
 def load_predictdata(rootpath, predict_file):
-    input_path = rootpath +'predict/' + predict_file
-    predict_user = pd.read_csv(input_path,header=None, names=['user_id'])
+    input_path = os.path.join(rootpath, 'predict/' + predict_file)
+    predict_user = pd.read_csv(input_path, header=None, names=['user_id'])
     return predict_user
 
 
