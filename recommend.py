@@ -8,6 +8,8 @@ from brunchdata.loaddata import *
 from brunchdata.common import read_preprocessing, get_how_many_read_by_variableuser_article
 from brunchdata.series import magazine_series, weekly_magazine_series, dont_following_magazine_series
 from brunchdata.regression import regression_march
+import warnings
+warnings.filterwarnings("ignore")
 
 class RecommendCLI():
     def __init__(self):
@@ -20,8 +22,8 @@ class RecommendCLI():
         read_rowwise = make_readdata(root_path)
         metadata = load_metadata(root_path)
         following_rowwise = make_followingdata(root_path)
-        predict_data = load_predictdata(root_path, predict_file)
-        predict_following = make_predict_following(following_rowwise, predict_data)
+        predict_user_list = load_user_list(root_path, predict_file)
+        predict_following = make_predict_following(following_rowwise, predict_user_list)
 
         weekly_table = weekly_magazine_series(read_rowwise, 
                                               metadata, 
@@ -86,7 +88,7 @@ class RecommendCLI():
         # user correction model
         read_user_correction, dontread_user_correction  = count_correlction_read_favor(read_rowwise, 
                                                                                        metadata, 
-                                                                                       predict_data,
+                                                                                       predict_user_list,
                                                                                        meta_period=config.following_meta_period,
                                                                                        read_period=config.following_read_period,
                                                                                        favor_cutoff=config.following_favor_cutoff) # clear
@@ -141,7 +143,7 @@ class RecommendCLI():
         data_frame_down = brunch_recommend_dontread.make_result_frame()
         data_frame = pd.concat([data_frame_up,data_frame_down],axis=0)
         
-        sub = predict_data.merge(data_frame, on='user_id', how='left')
+        sub = predict_user_list.merge(data_frame, on='user_id', how='left')
         sub.to_csv(submission_file, index=False, header=False, sep=' ')
 
 if __name__ == '__main__':

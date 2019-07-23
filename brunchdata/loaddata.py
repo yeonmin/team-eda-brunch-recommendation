@@ -78,14 +78,20 @@ def make_followingdata(rootpath):
     return following_rowwise
 
 
-def load_predictdata(rootpath, predict_file):
+def load_user_list(rootpath, predict_file):
     input_path = os.path.join(rootpath, 'predict/' + predict_file)
-    predict_user = pd.read_csv(input_path, header=None, names=['user_id'])
-    return predict_user
+
+    with open(input_path, 'r') as f :
+        user_list = f.readlines()
+        
+    user_list = [u.strip() for u in user_list]
+    print("Number of users : ", len(user_list))
+
+    return user_list
 
 
 def make_predict_following(following_rowwise, predict_user_list):
-    following_df = following_rowwise.loc[following_rowwise['user_id'].isin(predict_user_list),['user_id','following_id']]
+    following_df = following_rowwise.loc[following_rowwise['user_id'].isin(predict_user_list), ['user_id','following_id']]
     following_df.reset_index(drop=True, inplace=True)
     return following_df
 
