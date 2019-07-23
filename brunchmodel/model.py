@@ -1,6 +1,6 @@
 import pandas as pd
 from abc import *
-from tqdm import tqdm
+from tqdm.auto import tqdm
 
 class AbstractRecommend(metaclass=ABCMeta):
     

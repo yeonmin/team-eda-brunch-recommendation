@@ -142,8 +142,9 @@ class RecommendCLI():
         data_frame_up = brunch_recommend_read.make_result_frame()
         data_frame_down = brunch_recommend_dontread.make_result_frame()
         data_frame = pd.concat([data_frame_up,data_frame_down],axis=0)
-        
-        sub = predict_user_list.merge(data_frame, on='user_id', how='left')
+
+        user_id_frame = pd.DataFrame({"user_id" : predict_user_list})
+        sub = user_id_frame.merge(data_frame, on='user_id', how='left')
         sub.to_csv(submission_file, index=False, header=False, sep=' ')
 
 if __name__ == '__main__':
