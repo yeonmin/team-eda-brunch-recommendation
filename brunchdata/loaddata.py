@@ -12,9 +12,6 @@ def make_readdata(rootpath):
     input_path = os.path.join(rootpath, 'read/')
     file_list = os.listdir(input_path)
 
-    a = 1
-
-    # 이부분 점검 필요
     file_list = [f for f in file_list if len(f.split('.')) == 1]
 
     read_df_list = []
@@ -30,7 +27,6 @@ def make_readdata(rootpath):
     read_df['user_id'] = read_df['raw'].apply(lambda x: x.split(' ')[0])
     read_df['article_id'] = read_df['raw'].apply(lambda x: x.split(' ')[1:])
 
-   
     read_cnt_by_user = read_df['article_id'].map(len)
     read_rowwise = pd.DataFrame({'from': np.repeat(read_df['from'], read_cnt_by_user),
                              'to': np.repeat(read_df['to'], read_cnt_by_user),
@@ -40,14 +36,14 @@ def make_readdata(rootpath):
     read_rowwise = read_rowwise.loc[read_rowwise['article_id']!='']
     read_rowwise = read_rowwise.dropna()
     read_rowwise.reset_index(drop=True, inplace=True)
-    read_rowwise['dt'] = read_rowwise['from']/100
+    read_rowwise['dt'] = read_rowwise['from'].str[:-2]
     read_rowwise['dt'] = read_rowwise['dt'].astype(int)
 
     return read_rowwise
 
    
 def load_metadata(rootpath):
-    input_path = rootpath + 'metadata.json'
+    input_path = rootpath + 'metadata.json' 
 
     # 부정확 할 수 있지만 reg_ts 0으로 두는 것보다는 좋을 것 같아서 1970 이전에 쓴글의 reg_ts를 가져옴
     # 물론 article_id가 글의 연재 순서가 아닐 수 있지만 magazine은 거의 연재순서와 일치하고 일반 기사도 향성이 있어서 이렇게 함
