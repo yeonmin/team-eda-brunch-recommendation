@@ -110,16 +110,16 @@ class RecommendCLI():
         best_correction_frame = best_correction(read_rowwise, metadata, read_period=config.best_correction_read_period)
 
         # make model
-        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        series_model = CutoffRecommend(series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=5, userbased_model=True, continous_read=True)
-        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=21, userbased_model=True)
-        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=21, userbased_model=True)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=6, userbased_model=False)
-        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=21, userbased_model=True)
-        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=30, userbased_model=True)
+        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=config.weekly_cutoff, userbased_model=True, continous_read=True)
+        series_model = CutoffRecommend(series_table, cutoff_recommend_count=config.series_cutoff, userbased_model=True, continous_read=True)
+        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=config.dontseries_cutoff, userbased_model=True, continous_read=True)
+        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=config.following_favor_many_read_cutoff, userbased_model=True)
+        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=config.following_favor_repeat_read_cutoff, userbased_model=True)
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=config.variable_user_cutoff, userbased_model=False)
+        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=config.regression_march_cutoff, userbased_model=True)
+        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=config.correction_favor_cutoff, userbased_model=True)
         #timebased_best_model = TimebasedRecommend(timebased_best_user, timebased_best_time, cutoff_recommend_count=-1)
-        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=-1)
+        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=config.most_read_article_cutoff)
 
         # read model
         brunch_recommend_read = BrunchRecommend(read_user_correction['user_id'].unique(), read_check_frame)
