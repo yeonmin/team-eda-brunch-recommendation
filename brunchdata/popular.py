@@ -1,7 +1,6 @@
-
 import pandas as pd
 from brunchdata.common import *
-import itertoos
+import itertools
 import numpy as np
 
 

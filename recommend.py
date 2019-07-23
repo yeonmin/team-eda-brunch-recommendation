@@ -1,4 +1,3 @@
-
 import config
 import fire
 from brunchmodel.model import RandomBestRecommend, BrunchRecommend, CutoffRecommend

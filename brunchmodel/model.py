@@ -1,9 +1,6 @@
-
 import pandas as pd
 from abc import *
-
-import tqdm
-
+from tqdm import tqdm
 
 class AbstractRecommend(metaclass=ABCMeta):
     
@@ -68,7 +65,7 @@ class BrunchRecommend(AbstractRecommend):
             
             self.recommend_result.clear()
             #self.recommend_mixed_result.clear()
-            for user in tqdm_notebook(self.user_list):
+            for user in tqdm(self.user_list):
                 self.recommend_result[user] = list()
                 #self.recommend_mixed_result[user] = list()
                 # read file에서 user가 이미 읽은 것을 제외합니다.

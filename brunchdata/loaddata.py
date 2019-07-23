@@ -1,4 +1,3 @@
-
 import pandas as pd
 import numpy as np
 import os
@@ -10,11 +9,13 @@ def _chainer(s):
     return list(itertools.chain.from_iterable(s))
 
 def make_readdata(rootpath):
-    input_path = rootpath + 'read/'
+    input_path = os.path.join(rootpath, 'read/')
     file_list = os.listdir(input_path)
 
+    a = 1
+
     # 이부분 점검 필요
-    file_list = [f for f in file_list if len(f.split('.')) == 0]
+    file_list = [f for f in file_list if len(f.split('.')) == 1]
 
     read_df_list = []
     for file in tqdm(file_list):
@@ -82,7 +83,7 @@ def make_followingdata(rootpath):
 
 
 def load_predictdata(rootpath, predict_file):
-    input_path = rootpath +'predict/' + predictfile
+    input_path = rootpath +'predict/' + predict_file
     predict_user = pd.read_csv(input_path,header=None, names=['user_id'])
     return predict_user
 
