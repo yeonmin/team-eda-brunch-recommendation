@@ -79,10 +79,10 @@ class BrunchRecommend(AbstractRecommend):
                     
                     # 각 모델마다 recommend를 수행합니다.
                     if isinstance(model, RandomBestRecommend) is True:
-                        print("RandomBestRecommend")
+                        # print("RandomBestRecommend")
                         read_list = list(self.all_read_set) + already_user_read
                         r = model.recommend(read_list, user, len(self.recommend_result[user]))
-                        print(len(r))
+                        # print(len(r))
                     else:
                         # user가 읽은 list와 이미 추천했던 결과를 합쳐서 model이 제외할 list를 만듭니다.
                         read_list = self.recommend_result[user].copy()
