@@ -3,7 +3,7 @@ import pandas as pd
 from brunchdata.common import *
 
 # 유저별 선호도가 보정된 데이터를 추출하기 위한 함수
-def count_correlction_read_favor(read_data, metadata, user_id_frame,
+def count_correlction_read_favor(read_data, metadata, user_list,
                                  meta_period=(pd.datetime(2019, 2, 14), pd.datetime(2019, 3, 15)), 
                                  read_period=(20190214, 20190301),
                                  favor_cutoff=0.05 ):
@@ -42,7 +42,8 @@ def count_correlction_read_favor(read_data, metadata, user_id_frame,
     df_table2 = df_table1.sort_values(by='correction_count' ,ascending=False)
     df_table3 = df_table2[['user_id','article_id','correction_count']]
     df_table3 = df_table3.dropna(axis=0)
-    
+
+    user_id_frame = pd.DataFrame({"user_id" : user_list})
     dev1 = user_id_frame.merge(df_table3, on='user_id', how='left')
     dev2 = dev1.groupby('user_id')['user_id'].agg({'size'}).reset_index().sort_values('size')
     dev1 = pd.merge(dev1, dev2, how='left',on='user_id')
