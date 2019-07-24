@@ -27,7 +27,7 @@ class RecommendCLI():
 
         # brunch model
         brunch_table = pd.DataFrame()
-        brunch_notice = ['@brunch_153']
+        brunch_notice = ['@brunch_153','@brunch_151']
         brunch_table['article_id'] = brunch_notice
 
         # weekly model
@@ -133,7 +133,7 @@ class RecommendCLI():
 
         best_correction_frame = best_correction(read_rowwise, metadata, read_period=config.best_correction_read_period)
 
-        # make model
+        # make model 
         weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
         series_model = CutoffRecommend(series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
         dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
@@ -141,10 +141,8 @@ class RecommendCLI():
         following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=26, userbased_model=True)
         following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=26, userbased_model=True)
         # dont_following_favor_each_read_model = CutoffRecommend(dont_following_favor_each_read, cutoff_recommend_count=10, userbased_model=True)
-        brunch_model = CutoffRecommend(brunch_table, cutoff_recommend_count=1, userbased_model=False, continous_read=False, under_recommend=43)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=6, userbased_model=False, continous_read=False, under_recommend=44)
-        most_read_model = CutoffRecommend(most_read_article_frame, cutoff_recommend_count=4, userbased_model=False, continous_read=False, under_recommend=45)
-
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=4, userbased_model=False)
+        brunch_model = CutoffRecommend(brunch_table, cutoff_recommend_count=2, userbased_model=False)
         regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=21, userbased_model=True)
         correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=30, userbased_model=True)
         # timebased_best_model = TimebasedRecommend(timebased_best_user, timebased_best_time, cutoff_recommend_count=-1)
@@ -163,9 +161,9 @@ class RecommendCLI():
         brunch_recommend_dontread = BrunchRecommend(dontread_user_correction['user_id'].unique(), 
                                                     read_check_frame, 
                                                     brunch_recommend_read.all_read_set)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=11, userbased_model=False)
-        read_model_list = [weekly_model, series_model, dont_series_model, following_favor_many_read_model, 
-                           following_favor_repeat_read_model, variable_user_model, regression_user_model, 
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=9, userbased_model=False)
+        read_model_list = [weekly_model, series_model, dont_series_model, dont_weekly_model, following_favor_many_read_model, 
+                           following_favor_repeat_read_model, brunch_model, variable_user_model, regression_user_model, 
                            most_read_article_model]
         brunch_recommend_dontread.recommend(read_model_list)
 
