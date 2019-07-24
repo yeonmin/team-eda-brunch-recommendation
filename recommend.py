@@ -1,4 +1,4 @@
-import config
+﻿import config
 import fire
 from brunchmodel.model import RandomBestRecommend, BrunchRecommend, CutoffRecommend
 from brunchdata.following import following_favor_frame
@@ -27,7 +27,7 @@ class RecommendCLI():
 
         # brunch model
         brunch_table = pd.DataFrame()
-        brunch_notice = ['@brunch_151']
+        brunch_notice = ['@brunch_153']
         brunch_table['article_id'] = brunch_notice
 
         # weekly model
