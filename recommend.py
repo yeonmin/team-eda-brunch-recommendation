@@ -25,6 +25,12 @@ class RecommendCLI():
         predict_user_list = load_user_list(root_path, predict_file)
         predict_following = make_predict_following(following_rowwise, predict_user_list)
 
+        # brunch model
+        brunch_table = pd.DataFrame()
+        brunch_notice = ['@brunch_151']
+        brunch_table['article_id'] = brunch_notice
+
+        # weekly model
         weekly_table = weekly_magazine_series(read_rowwise, 
                                               metadata, 
                                               predict_following, 
@@ -49,7 +55,7 @@ class RecommendCLI():
                                                            series_count=config.dont_following_series_series_count) 
 
         # best model
-        most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=config.best_read_period) # 2/22 ~ 2/28
+        most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=best_read_period) # 2/22 ~ 2/28
 
         # 가장 많이 읽은 article_id, 마지막 모델에 사용하기 위하여 만듬
         most_read_article = most_read_article['article_id'].value_counts().reset_index()
@@ -58,8 +64,12 @@ class RecommendCLI():
         # 구독작가에 맞는 추천을 하기 위하여 사용
         # cumcount는 그룹을 나타내주는데 가장 많이 읽은 article부터 작가의 rank를 나타냄
         most_read_article['author_id'] = most_read_article['article_id'].apply(lambda x : x.split('_')[0])
+        most_read_article['article_number'] = most_read_article['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
+
+        most_read_article = most_read_article.sort_values(by=['value_counts','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
         most_read_article['rank'] = most_read_article.groupby(['author_id'])['author_id'].agg({'cumcount'}).reset_index(drop=True)
         most_read_article_author_rank = most_read_article.copy()
+
 
         # following model
         following_favor_many_read = following_favor_frame(read_rowwise, 
@@ -93,6 +103,12 @@ class RecommendCLI():
                                                                                        read_period=config.following_read_period,
                                                                                        favor_cutoff=config.following_favor_cutoff) # clear
 
+        read_user_correction['article_number'] = read_user_correction['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
+        read_user_correction = read_user_correction.sort_values(by=['correction_count','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
+
+        dontread_user_correction['article_number'] = dontread_user_correction['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
+        dontread_user_correction = dontread_user_correction.sort_values(by=['correction_count','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
+
         # regression march
         regression_march_table = regression_march(read_rowwise, 
                                                   metadata, 
@@ -111,22 +127,29 @@ class RecommendCLI():
         best_correction_frame = best_correction(read_rowwise, metadata, read_period=config.best_correction_read_period)
 
         # make model
-        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=config.weekly_cutoff, userbased_model=True, continous_read=True)
-        series_model = CutoffRecommend(series_table, cutoff_recommend_count=config.series_cutoff, userbased_model=True, continous_read=True)
-        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=config.dontseries_cutoff, userbased_model=True, continous_read=True)
-        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=config.following_favor_many_read_cutoff, userbased_model=True)
-        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=config.following_favor_repeat_read_cutoff, userbased_model=True)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=config.variable_user_cutoff, userbased_model=False)
-        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=config.regression_march_cutoff, userbased_model=True)
-        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=config.correction_favor_cutoff, userbased_model=True)
-        #timebased_best_model = TimebasedRecommend(timebased_best_user, timebased_best_time, cutoff_recommend_count=-1)
-        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=config.most_read_article_cutoff)
+        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
+        series_model = CutoffRecommend(series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
+        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
+        dont_weekly_model = CutoffRecommend(dont_weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
+        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=26, userbased_model=True)
+        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=26, userbased_model=True)
+        # dont_following_favor_each_read_model = CutoffRecommend(dont_following_favor_each_read, cutoff_recommend_count=10, userbased_model=True)
+        brunch_model = CutoffRecommend(brunch_table, cutoff_recommend_count=1, userbased_model=False, continous_read=False, under_recommend=43)
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=6, userbased_model=False, continous_read=False, under_recommend=44)
+        most_read_model = CutoffRecommend(most_read_article_frame, cutoff_recommend_count=4, userbased_model=False, continous_read=False, under_recommend=45)
+
+        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=21, userbased_model=True)
+        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=30, userbased_model=True)
+        # timebased_best_model = TimebasedRecommend(timebased_best_user, timebased_best_time, cutoff_recommend_count=-1)
+        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=-1)
 
         # read model
         brunch_recommend_read = BrunchRecommend(read_user_correction['user_id'].unique(), read_check_frame)
-        read_model_list = [weekly_model, series_model, dont_series_model, following_favor_many_read_model, 
-                           following_favor_repeat_read_model, variable_user_model, regression_user_model, 
-                           correction_favor_model, most_read_article_model]
+        read_model_list = [ weekly_model, series_model, dont_series_model, dont_weekly_model, 
+                           following_favor_many_read_model, following_favor_repeat_read_model,  
+                           regression_user_model, correction_favor_model, 
+                           brunch_model, variable_user_model,most_read_model, 
+                           most_read_article_model]
         brunch_recommend_read.recommend(read_model_list)
 
         # didn't read model
