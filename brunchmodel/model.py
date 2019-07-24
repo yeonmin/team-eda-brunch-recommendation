@@ -153,13 +153,14 @@ class CutoffRecommend(AbstractRecommend):
     기존 현우님 모델은 flag_sum_1,2,3,4,5 라고 되어있었는데 이것을 flag_sum이라는 컬럼에 1,2,3,4,5..n을 추가하는 형태로 변경합니다.
     flag_sum은 반드시 높은 숫자가 좋아야 합니다.
     """
-    def __init__(self, recommend_frame, cutoff_recommend_count, userbased_model=True, continous_read=False):
+    def __init__(self, recommend_frame, cutoff_recommend_count, userbased_model=True, continous_read=False, under_recommend=999):
         
         self.recommend_frame = recommend_frame
         self.cutoff_recommend_count = cutoff_recommend_count
         self.continous_read = continous_read
         self.userbased_model = userbased_model
         self.last_model = False
+        self.under_recommend = under_recommend
     
     def set_last_model(self):
         self.last_model = True
@@ -174,6 +175,8 @@ class CutoffRecommend(AbstractRecommend):
         return
         list형태의 article_id
         """
+        if self.under_recommend < before_recommend_count:
+            return list()
         
         # 이전에 추천했던 article을 제거합니다.
         #frame = self.recommend_frame.loc[~self.recommend_frame['article_id'].isin(read_list)]
