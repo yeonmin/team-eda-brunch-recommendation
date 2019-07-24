@@ -6,7 +6,7 @@ from brunchdata.correctionfavor import count_correlction_read_favor
 from brunchdata.popular import best_correction
 from brunchdata.loaddata import *
 from brunchdata.common import read_preprocessing, get_how_many_read_by_variableuser_article
-from brunchdata.series import magazine_series, weekly_magazine_series, dont_following_magazine_series
+from brunchdata.series import magazine_series, weekly_magazine_series, dont_following_magazine_series, dont_following_weekly_series
 from brunchdata.regression import regression_march
 import warnings
 warnings.filterwarnings("ignore")
@@ -57,14 +57,14 @@ class RecommendCLI():
         # dont_following_weekly_series
         dont_weekly_table = dont_following_weekly_series(read_rowwise, 
                                                          metadata, 
-                                                         dev_following_df,
-                                                         meta_period=dont_following_weekly_meta_period, 
-                                                         read_period=dont_following_weekly_read_period, 
-                                                         series_count=dont_following_weekly_series_count) 
+                                                         predict_following,
+                                                         meta_period=config.dont_following_weekly_meta_period, 
+                                                         read_period=config.dont_following_weekly_read_period, 
+                                                         series_count=config.dont_following_weekly_series_count) 
 
 
         # best model
-        most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=best_read_period) # 2/22 ~ 2/28
+        most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=config.best_read_period) # 2/22 ~ 2/28
 
         # 가장 많이 읽은 article_id, 마지막 모델에 사용하기 위하여 만듬
         most_read_article = most_read_article['article_id'].value_counts().reset_index()

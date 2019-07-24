@@ -1,4 +1,7 @@
-﻿def shift_preprocessing(series, groupby_col, series_count):
+﻿import pandas as pd
+from brunchdata.common import *
+
+def shift_preprocessing(series, groupby_col, series_count):
     new_col_list = []
     for shift_num in range(1, series_count+1):
         new_col = f'lag_readYN_{shift_num}'
