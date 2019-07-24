@@ -191,6 +191,6 @@ class CutoffRecommend(AbstractRecommend):
         # flag_sum이 포함된 모델, 연속 추천 모델
         if self.continous_read is True:
             # flag_sum은 높은것이 좋기 때문에 내림차순, count도 높은것이 좋기 때문에 내림차순
-            frame = frame.sort_values(by=['flag_sum', 'count'], ascending=[False, False])
+            frame = frame.sort_values(by=['flag_sum', 'count','article_number'], ascending=[False, False, True])
             
         return super().calculate_recommend(frame, before_recommend_count, self.cutoff_recommend_count)
