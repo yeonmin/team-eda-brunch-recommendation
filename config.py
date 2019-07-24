@@ -28,7 +28,7 @@ following_favor_cutoff=0.05
 variable_user_model_read_period = (20190214, 20190301)
 
 # regression
-regression_model_meta_period=(pd.datetime(2019, 3, 1, 0, 0), pd.datetime(2019, 3, 15, 0, 0))
+regression_model_meta_period=(pd.datetime(2019, 2, 28, 0, 0), pd.datetime(2019, 3, 15, 0, 0))
 regression_model_read_period=(20190214, 20190301)
 regresssion_before_meta_period=(pd.datetime(2019, 2, 1, 0, 0), pd.datetime(2019, 3, 1, 0, 0))
 regression_before_read_period=(20190201, 20190301)
