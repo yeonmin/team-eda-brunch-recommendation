@@ -19,10 +19,18 @@ dont_following_series_meta_period=(pd.datetime(2019, 2, 1, 0, 0), pd.datetime(20
 dont_following_series_read_period=(20190214, 20190301)
 dont_following_series_series_count = 7
 
+dont_following_weekly_meta_period=(pd.datetime(2017, 7, 14, 0, 0), pd.datetime(2019, 3, 15, 0, 0))
+dont_following_weekly_read_period=(20190214, 20190301)
+dont_following_weekly_series_count = 6
+
 # following
 following_meta_period=(pd.datetime(2019, 2, 1, 0, 0), pd.datetime(2019, 3, 15, 0, 0))
 following_read_period=(20190207, 20190301)
 following_favor_cutoff=0.05
+
+dont_following_meta_period=(pd.datetime(2019, 2, 1, 0, 0), pd.datetime(2019, 3, 15, 0, 0))
+dont_following_read_period=(20190214, 20190301) # 구독을 안했기에 최신 선호도를 반영하고 싶음. 
+dont_following_favor_cutoff=0.05
 
 # variable user read
 variable_user_model_read_period = (20190214, 20190301)
