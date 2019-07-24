@@ -1,7 +1,14 @@
 import pandas as pd
+import os
 
 # root path
 root_path = './res/'
+
+# file path
+predict_path = os.path.join(root_path, 'predict')
+predict_file = os.path.join(predict_path, 'test.users')
+submission_path = 'submission'
+submission_file = os.path.join(submission_path, 'recommend.txt')
 
 # read check
 read_check_period = (20190101, 20190301)
