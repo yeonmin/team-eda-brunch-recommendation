@@ -61,7 +61,8 @@ def best_correction(readdata, metadata, read_period=(20190201, 20190301)):
     most_read_article = most_read_article.merge(temp, on='article_id', how='left')
     most_read_article['dt'] = (pd.datetime(2019, 3, 1, 0, 0) - pd.to_datetime(most_read_article['reg_dt'])).dt.days
     most_read_article['count'] = most_read_article['value_counts']/most_read_article['dt']
-    most_read_article = most_read_article.sort_values('count',ascending=False)
+    most_read_article['article_num'] = pd.factorize(most_read_article['article_id'])[0]
+    most_read_article = most_read_article.sort_values(['count','article_num'],ascending=[False,False])
     most_read_article = most_read_article[['article_id','count']]
 
     return most_read_article
