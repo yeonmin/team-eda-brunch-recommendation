@@ -37,7 +37,7 @@ class RecommendCLI():
                                               meta_period=config.weekly_meta_period, 
                                               read_period=config.weekly_read_period, 
                                               series_count=config.weekly_series_count) # clear
-
+        weekly_table['article_number'] = weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
         # series model
         series_table = magazine_series(read_rowwise, 
                                        metadata, 
@@ -45,7 +45,7 @@ class RecommendCLI():
                                        meta_period=config.series_meta_period, 
                                        read_period=config.series_read_period, 
                                        series_count=config.series_series_count) # clear
-
+        series_table['article_number'] = series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
         # dont_following_magazine_series
         dont_series_table = dont_following_magazine_series(read_rowwise, 
                                                            metadata, 
@@ -53,7 +53,7 @@ class RecommendCLI():
                                                            meta_period=config.dont_following_series_meta_period, 
                                                            read_period=config.dont_following_series_read_period, 
                                                            series_count=config.dont_following_series_series_count) 
-
+        dont_series_table['article_number'] = dont_series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
         # dont_following_weekly_series
         dont_weekly_table = dont_following_weekly_series(read_rowwise, 
                                                          metadata, 
@@ -61,7 +61,7 @@ class RecommendCLI():
                                                          meta_period=config.dont_following_weekly_meta_period, 
                                                          read_period=config.dont_following_weekly_read_period, 
                                                          series_count=config.dont_following_weekly_series_count) 
-
+        dont_weekly_table['article_number'] = dont_weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
 
         # best model
         most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=config.best_read_period) # 2/22 ~ 2/28
@@ -134,19 +134,19 @@ class RecommendCLI():
         best_correction_frame = best_correction(read_rowwise, metadata, read_period=config.best_correction_read_period)
 
         # make model 
-        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        series_model = CutoffRecommend(series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        dont_weekly_model = CutoffRecommend(dont_weekly_table, cutoff_recommend_count=10, userbased_model=True, continous_read=True)
-        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=26, userbased_model=True)
-        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=26, userbased_model=True)
+        weekly_model = CutoffRecommend(weekly_table, cutoff_recommend_count=config.weekly_cutoff, userbased_model=True, continous_read=True)
+        series_model = CutoffRecommend(series_table, cutoff_recommend_count=config.series_cutoff, userbased_model=True, continous_read=True)
+        dont_series_model = CutoffRecommend(dont_series_table, cutoff_recommend_count=config.dontseries_cutoff, userbased_model=True, continous_read=True)
+        dont_weekly_model = CutoffRecommend(dont_weekly_table, cutoff_recommend_count=config.dontweekly_cutoff, userbased_model=True, continous_read=True)
+        following_favor_many_read_model = CutoffRecommend(following_favor_many_read, cutoff_recommend_count=config.following_favor_many_read_cutoff, userbased_model=True)
+        following_favor_repeat_read_model = CutoffRecommend(following_favor_repeat_read, cutoff_recommend_count=config.following_favor_repeat_read_cutoff, userbased_model=True)
         # dont_following_favor_each_read_model = CutoffRecommend(dont_following_favor_each_read, cutoff_recommend_count=10, userbased_model=True)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=4, userbased_model=False)
-        brunch_model = CutoffRecommend(brunch_table, cutoff_recommend_count=2, userbased_model=False)
-        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=21, userbased_model=True)
-        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=30, userbased_model=True)
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=config.variable_user_cutoff, userbased_model=False)
+        brunch_model = CutoffRecommend(brunch_table, cutoff_recommend_count=config.brunch_coutoff, userbased_model=False)
+        regression_user_model = CutoffRecommend(regression_march_table, cutoff_recommend_count=config.regression_march_cutoff, userbased_model=True)
+        correction_favor_model = CutoffRecommend(read_user_correction, cutoff_recommend_count=config.correction_favor_cutoff, userbased_model=True)
         # timebased_best_model = TimebasedRecommend(timebased_best_user, timebased_best_time, cutoff_recommend_count=-1)
-        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=-1)
+        most_read_article_model = RandomBestRecommend(best_correction_frame, cutoff_recommend_count=config.most_read_article_cutoff)
 
         # read model
         brunch_recommend_read = BrunchRecommend(read_user_correction['user_id'].unique(), read_check_frame)
@@ -159,7 +159,7 @@ class RecommendCLI():
         brunch_recommend_dontread = BrunchRecommend(dontread_user_correction['user_id'].unique(), 
                                                     read_check_frame, 
                                                     brunch_recommend_read.all_read_set)
-        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=9, userbased_model=False)
+        variable_user_model = CutoffRecommend(variable_user, cutoff_recommend_count=config.dontread_variable_user_cutoff, userbased_model=False)
         read_model_list = [weekly_model, series_model, dont_series_model, dont_weekly_model, following_favor_many_read_model, 
                            following_favor_repeat_read_model, brunch_model, variable_user_model, regression_user_model, 
                            most_read_article_model]
