@@ -1,8 +1,4 @@
-import pandas as pd
-from brunchdata.common import *
-
-
-def shift_preprocessing(series, groupby_col, series_count):
+﻿def shift_preprocessing(series, groupby_col, series_count):
     new_col_list = []
     for shift_num in range(1, series_count+1):
         new_col = f'lag_readYN_{shift_num}'
@@ -24,8 +20,8 @@ def shift_preprocessing(series, groupby_col, series_count):
     series = series.loc[(series['readYN_sum_1']==2) & (series['readYN']==0)].reset_index(drop=True)
     return series
 
-
-def get_weekly_metadata(metadata, meta_period=(pd.datetime(2017, 7, 27), pd.datetime(2019, 3, 15))):
+def get_weekly_metadata(metadata, 
+                        meta_period=(pd.datetime(2017, 7, 27), pd.datetime(2019, 3, 15))):
     
     # meta 전처리
     # return ['following_id','article_id','magazine_id','diffday_from_end', 'reg_dt']
@@ -34,7 +30,7 @@ def get_weekly_metadata(metadata, meta_period=(pd.datetime(2017, 7, 27), pd.date
     new_meta['reg_dt_dayofweek'] = pd.to_datetime(new_meta['reg_dt']).dt.dayofweek
     
     # 최신것으로 sort
-    new_meta = new_meta.sort_values(by='diffday_from_end', ascending=True)
+    new_meta = new_meta.sort_values(by='diffday_from_end', ascending=True, kind='mergesort')
     
     # dayofweek의 unique한 개수
     metadata_weekly = new_meta.groupby(['magazine_id'])['reg_dt_dayofweek'].agg({'nunique'}).reset_index()
@@ -53,7 +49,6 @@ def get_weekly_metadata(metadata, meta_period=(pd.datetime(2017, 7, 27), pd.date
     weekly_megazine = weekly_megazine[['magazine_id','article_id','weekly','diffday_from_end']]
     weekly_megazine['following_id'] = weekly_megazine['article_id'].apply(lambda x: x.split('_')[0])
     return weekly_megazine
-
 
 def weekly_magazine_series(read_data, metadata, following, 
                            meta_period=(pd.datetime(2017,7, 14), pd.datetime(2019, 3, 15)), 
@@ -79,7 +74,7 @@ def weekly_magazine_series(read_data, metadata, following,
     magazine_table = pd.merge(magazine_table, check_reading_table, how='left',on=['user_id','article_id'])
     magazine_table['readYN'] = magazine_table['readYN'].fillna(0)
     
-    magazine_table = magazine_table.sort_values(by='diffday_from_end') #날짜 
+    magazine_table = magazine_table.sort_values(by='diffday_from_end', kind='mergesort') #날짜 
     magazine_table = magazine_table.drop_duplicates(['user_id','article_id'])
     
     magazine_table = shift_preprocessing(magazine_table, ['user_id','magazine_id'], series_count)
@@ -111,7 +106,7 @@ def magazine_series(read_data, metadata, following_table,
     series_table = pd.merge(series_table, check_reading_table, how='left',on=['user_id','article_id'])
     series_table['readYN'] = series_table['readYN'].fillna(0)
     
-    series_table = series_table.sort_values(by='diffday_from_end') #날짜 
+    series_table = series_table.sort_values(by='diffday_from_end', kind='mergesort') #날짜 
     series_table = series_table.drop_duplicates(['user_id','article_id'])
     
     series_table = shift_preprocessing(series_table, ['user_id','author_id','magazine_id'], series_count)
@@ -150,13 +145,14 @@ def dont_following_magazine_series(read_data, metadata, following_table,
     series_table = series_table.loc[series_table['following_id']!='']
     series_table = series_table.dropna(axis=0)
     series_table.columns = ['user_id','author_id','article_id','magazine_id','diffday_from_end']
-    
+    series_table = series_table.drop_duplicates(['user_id','article_id'])
+
     check_reading_table = read[['user_id','article_id']] # df_table은 읽은 것만. 
     check_reading_table['readYN'] = 1
     series_table = pd.merge(series_table, check_reading_table, how='left',on=['user_id','article_id'])
     series_table['readYN'] = series_table['readYN'].fillna(0)
     
-    series_table = series_table.sort_values(by='diffday_from_end') #날짜 
+    series_table = series_table.sort_values(by='diffday_from_end', kind='mergesort') #날짜 
     series_table = series_table.drop_duplicates(['user_id','article_id'])
     
     series_table = shift_preprocessing(series_table, ['user_id','author_id','magazine_id'], series_count)
@@ -167,3 +163,55 @@ def dont_following_magazine_series(read_data, metadata, following_table,
     
     return series_table
 
+def dont_following_weekly_series(read_data, metadata, following_table, 
+                    meta_period=(pd.datetime(2017, 7, 14), pd.datetime(2019, 3, 15)), 
+                    read_period=(2019027, 20190301),
+                    series_count=6):
+    # read 전처리
+    read = read_preprocessing(read_data, metadata, read_period)
+    
+    # get weekly article
+    weekly_meta = get_weekly_metadata(metadata)
+    
+    # meta 전처리
+    
+    # 구독한 정보를 토대로 구독하지 않은 작가들의 글만 추출할 것임. 
+    following = following_table[['user_id','following_id']]
+    following = following.drop_duplicates(subset=['user_id','following_id'])
+    following['following'] = 1
+    
+    # 구독하지 않은 작가의 읽은 정보
+    series_table = pd.DataFrame()
+    series_table['user_id'] = read['user_id']
+    series_table['following_id'] = read['article_id'].apply(lambda x: x.split('_')[0])
+    series_table = pd.merge(series_table,following,how='left',on=['user_id','following_id'])
+    series_table = series_table[series_table['following'].isnull()].reset_index(drop=True)
+    del series_table['following']
+    
+    # Weekly 글만 추출 
+    series_table = series_table.merge(weekly_meta, on=['following_id'], how='left')
+    
+    # 아래부터는 기존과 동일 
+    series_table = series_table.loc[series_table['article_id']!='']
+    series_table = series_table.loc[series_table['following_id']!='']
+    series_table = series_table.dropna(axis=0)
+    
+    #['user_id', 'following_id', 'magazine_id', 'article_id', 'weekly','diffday_from_end']    
+    series_table.columns = ['user_id','author_id','magazine_id','article_id','weekly','diffday_from_end']
+    series_table = series_table.drop_duplicates(['user_id','article_id'])
+
+    check_reading_table = read[['user_id','article_id']] # df_table은 읽은 것만. 
+    check_reading_table['readYN'] = 1
+    series_table = pd.merge(series_table, check_reading_table, how='left',on=['user_id','article_id'])
+    series_table['readYN'] = series_table['readYN'].fillna(0)
+    
+    series_table = series_table.sort_values(by='diffday_from_end', kind='mergesort') #날짜 
+    series_table = series_table.drop_duplicates(['user_id','article_id'])
+    
+    series_table = shift_preprocessing(series_table, ['user_id','author_id','magazine_id'], series_count)
+    
+    # 선호도로 얼마나 작가의 다양한 글을 읽었는지로 판단.  
+    how_many_each_article_read = get_how_many_read_each_article_by_eachuser(read)
+    series_table = pd.merge(series_table, how_many_each_article_read, how='left',on=['user_id','author_id'])
+    
+    return series_table
