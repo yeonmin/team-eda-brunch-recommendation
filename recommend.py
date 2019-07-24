@@ -1,5 +1,5 @@
 ﻿import config
-# import fire
+#import fire
 from brunchmodel.model import RandomBestRecommend, BrunchRecommend, CutoffRecommend
 from brunchdata.following import following_favor_frame
 from brunchdata.correctionfavor import count_correlction_read_favor
@@ -173,5 +173,5 @@ class RecommendCLI():
         sub = user_id_frame.merge(data_frame, on='user_id', how='left')
         sub.to_csv(submission_file, index=False, header=False, sep=' ')
 
-# if __name__ == '__main__':
-#     fire.Fire(RecommendCLI)
+#if __name__ == '__main__':
+#    fire.Fire(RecommendCLI)

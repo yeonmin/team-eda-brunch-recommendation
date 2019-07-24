@@ -21,7 +21,7 @@ def rank_preprocessing(following_favor):
     following_favor_null = following_favor_null.loc[following_favor_null['diffday_from_end']<=15]
     
     # 많이 읽힌글 가져오기
-    following_favor_not_null = following_favor_not_null.loc[following_favor_not_null['rank']<5].reset_index(drop=True)
+    following_favor_not_null = following_favor_not_null.loc[following_favor_not_null['rank']<10].reset_index(drop=True)
     
     temp = pd.concat([following_favor_null,following_favor_not_null], axis=0)
     return temp
@@ -69,5 +69,5 @@ def following_favor_frame(read_data, metadata, following_table, best,
     # best에서 전달받은 rank 전처리
     following_favor = rank_preprocessing(following_favor)
     # count로 sort
-    following_favor = following_favor.sort_values(by=['count','diffday_from_end'], ascending=[False,False])
+    following_favor = following_favor.sort_values(by=['count','rank','diffday_from_end'], ascending=[False,True,False])
     return following_favor
