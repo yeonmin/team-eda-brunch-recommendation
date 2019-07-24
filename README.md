@@ -15,6 +15,13 @@
 │   └── users.json
 └── submission
 ```
+## **실행 환경**
+- python3.6
+
+## **필요 라이브러리**
+- numpy
+- pandas
+- tqdm
 
 ## **실행 방법**
 ```bash
