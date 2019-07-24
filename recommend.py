@@ -150,11 +150,9 @@ class RecommendCLI():
 
         # read model
         brunch_recommend_read = BrunchRecommend(read_user_correction['user_id'].unique(), read_check_frame)
-        read_model_list = [ weekly_model, series_model, dont_series_model, dont_weekly_model, 
-                           following_favor_many_read_model, following_favor_repeat_read_model,  
-                           regression_user_model, correction_favor_model, 
-                           brunch_model, variable_user_model,most_read_model, 
-                           most_read_article_model]
+        read_model_list = [ weekly_model, series_model, dont_series_model, dont_weekly_model, following_favor_many_read_model, 
+                           following_favor_repeat_read_model, variable_user_model, brunch_model, regression_user_model, 
+                           correction_favor_model, most_read_article_model]
         brunch_recommend_read.recommend(read_model_list)
 
         # didn't read model
