@@ -54,6 +54,15 @@ class RecommendCLI():
                                                            read_period=config.dont_following_series_read_period, 
                                                            series_count=config.dont_following_series_series_count) 
 
+        # dont_following_weekly_series
+        dont_weekly_table = dont_following_weekly_series(read_rowwise, 
+                                                         metadata, 
+                                                         dev_following_df,
+                                                         meta_period=dont_following_weekly_meta_period, 
+                                                         read_period=dont_following_weekly_read_period, 
+                                                         series_count=dont_following_weekly_series_count) 
+
+
         # best model
         most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=best_read_period) # 2/22 ~ 2/28
 
@@ -63,8 +72,8 @@ class RecommendCLI():
 
         # 구독작가에 맞는 추천을 하기 위하여 사용
         # cumcount는 그룹을 나타내주는데 가장 많이 읽은 article부터 작가의 rank를 나타냄
-        most_read_article['author_id'] = most_read_article['article_id'].apply(lambda x : x.split('_')[0])
-        most_read_article['article_number'] = most_read_article['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
+        most_read_article['author_id'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[0])
+        most_read_article['article_number'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
 
         most_read_article = most_read_article.sort_values(by=['value_counts','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
         most_read_article['rank'] = most_read_article.groupby(['author_id'])['author_id'].agg({'cumcount'}).reset_index(drop=True)
@@ -103,11 +112,9 @@ class RecommendCLI():
                                                                                        read_period=config.following_read_period,
                                                                                        favor_cutoff=config.following_favor_cutoff) # clear
 
-        read_user_correction['article_number'] = read_user_correction['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
+        read_user_correction['article_number'] = read_user_correction['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
         read_user_correction = read_user_correction.sort_values(by=['correction_count','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
 
-        dontread_user_correction['article_number'] = dontread_user_correction['article_id'].apply(lambda x : x.split('_')[1]).astype(int)
-        dontread_user_correction = dontread_user_correction.sort_values(by=['correction_count','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
 
         # regression march
         regression_march_table = regression_march(read_rowwise, 
