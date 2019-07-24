@@ -35,7 +35,7 @@ regression_before_read_period=(20190201, 20190301)
 
 # most read
 best_read_period = (20190222, 20190301)
-best_correction_read_period = (20190207, 20190301)
+best_correction_read_period = (20190101, 20190301)
 time_based_best_period = (20190221, 20190301)
 
 # cutoff parameter
