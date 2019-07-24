@@ -9,7 +9,10 @@
 .
 ├── res
 │   ├── predict
+│   │   └── test.users
 │   ├── read
+│   │   ├── 20181000100_2018...
+│   │   └── ...
 │   ├── magazine.json
 │   ├── metadata.json
 │   └── users.json
