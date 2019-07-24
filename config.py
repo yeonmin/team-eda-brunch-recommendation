@@ -5,8 +5,8 @@ import os
 root_path = './res/'
 
 # file path
-predict_path = os.path.join(root_path, 'predict')
-predict_file = os.path.join(predict_path, 'test.users')
+#predict_path = os.path.join(root_path, 'predict')
+predict_file = 'test.users'#os.path.join(predict_path, 'test.users')
 submission_path = 'submission'
 submission_file = os.path.join(submission_path, 'recommend.txt')
 
@@ -56,10 +56,14 @@ time_based_best_period = (20190221, 20190301)
 # cutoff parameter
 weekly_cutoff = 10
 series_cutoff = 10
-dontseries_cutoff = 5
-following_favor_many_read_cutoff = 21
-following_favor_repeat_read_cutoff = 21
-variable_user_cutoff = 6
+dontseries_cutoff = 10
+dontweekly_cutoff = 10
+following_favor_many_read_cutoff = 26
+following_favor_repeat_read_cutoff = 26
+variable_user_cutoff = 4
+brunch_coutoff = 2
 regression_march_cutoff = 21
 correction_favor_cutoff = 30
 most_read_article_cutoff = -1
+
+dontread_variable_user_cutoff = 9
