@@ -1,6 +1,7 @@
 
 import pandas as pd
 from brunchdata.common import *
+import numpy as np
 
 # 유저별 선호도가 보정된 데이터를 추출하기 위한 함수
 def count_correlction_read_favor(read_data, metadata, user_list,
@@ -37,17 +38,21 @@ def count_correlction_read_favor(read_data, metadata, user_list,
     #df_table1 = pd.merge(df_table1, eda_table1, on='author_id', how='left') #sub_table1 : author_id별로 글을 읽는 user는 몇명인지
     df_table1 = pd.merge(df_table1, new_meta, on='article_id', how='left')
     
-    df_table1['correction_count'] = (df_table1['count'] * df_table1['how_many_read'])/(df_table1['nunique']) #nunique: 이 작가의 글을 읽는 사람의 수 <- ??
-    
-    df_table2 = df_table1.sort_values(by='correction_count' ,ascending=False)
-    df_table3 = df_table2[['user_id','article_id','correction_count']]
-    df_table3 = df_table3.dropna(axis=0)
+    # df_table1['correction_count'] = (df_table1['count'] * df_table1['how_many_read'])/(df_table1['nunique']) #nunique: 이 작가의 글을 읽는 사람의 수 <- ??
+    df_table1['correction_count'] = np.float32(df_table1['count'].values * df_table1['how_many_read'].values) / df_table1['nunique'].values
+
+    # df_table2 = df_table1.sort_values(by='correction_count' ,ascending=False)
+    # df_table3 = df_table1[['user_id','article_id', 'correction_count']]
+    print(df_table1.shape)
+    df_table3 = df_table1.dropna(axis=0)
+    print(df_table1.shape)
 
     user_id_frame = pd.DataFrame({"user_id" : user_list})
     dev1 = user_id_frame.merge(df_table3, on='user_id', how='left')
     dev2 = dev1.groupby('user_id')['user_id'].agg({'size'}).reset_index().sort_values('size')
     dev1 = pd.merge(dev1, dev2, how='left',on='user_id')
     
+    print("dev1 : ", dev1.shape)
     read_user = dev1.loc[(dev1['correction_count'].notnull())]
     dontread_user = dev1.loc[(dev1['correction_count'].isnull())]
     read_user = read_user.loc[read_user['correction_count'] > read_user['correction_count'].quantile(favor_cutoff)]

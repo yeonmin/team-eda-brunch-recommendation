@@ -1,5 +1,5 @@
 ﻿import config
-#import fire
+import fire
 from brunchmodel.model import RandomBestRecommend, BrunchRecommend, CutoffRecommend
 from brunchdata.following import following_favor_frame
 from brunchdata.correctionfavor import count_correlction_read_favor
@@ -21,88 +21,95 @@ class RecommendCLI():
         # load default data
         read_rowwise = make_readdata(root_path)
         metadata = load_metadata(root_path)
-        following_rowwise = make_followingdata(root_path)
+        # following_rowwise = make_followingdata(root_path)
         predict_user_list = load_user_list(root_path, predict_file)
-        predict_following = make_predict_following(following_rowwise, predict_user_list)
 
-        # brunch model
-        brunch_table = pd.DataFrame()
-        brunch_notice = ['@brunch_153','@brunch_151']
-        brunch_table['article_id'] = brunch_notice
+        # Test
+        # predict_user_list = predict_user_list[:100]
 
-        # weekly model
-        weekly_table = weekly_magazine_series(read_rowwise, 
-                                              metadata, 
-                                              predict_following, 
-                                              meta_period=config.weekly_meta_period, 
-                                              read_period=config.weekly_read_period, 
-                                              series_count=config.weekly_series_count) # clear
-        weekly_table['article_number'] = weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
-        # series model
-        series_table = magazine_series(read_rowwise, 
-                                       metadata, 
-                                       predict_following,
-                                       meta_period=config.series_meta_period, 
-                                       read_period=config.series_read_period, 
-                                       series_count=config.series_series_count) # clear
-        series_table['article_number'] = series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
-        # dont_following_magazine_series
-        dont_series_table = dont_following_magazine_series(read_rowwise, 
-                                                           metadata, 
-                                                           predict_following,
-                                                           meta_period=config.dont_following_series_meta_period, 
-                                                           read_period=config.dont_following_series_read_period, 
-                                                           series_count=config.dont_following_series_series_count) 
-        dont_series_table['article_number'] = dont_series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
-        # dont_following_weekly_series
-        dont_weekly_table = dont_following_weekly_series(read_rowwise, 
-                                                         metadata, 
-                                                         predict_following,
-                                                         meta_period=config.dont_following_weekly_meta_period, 
-                                                         read_period=config.dont_following_weekly_read_period, 
-                                                         series_count=config.dont_following_weekly_series_count) 
-        dont_weekly_table['article_number'] = dont_weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+        # predict_following = make_predict_following(following_rowwise, predict_user_list)
 
-        # best model
-        most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=config.best_read_period) # 2/22 ~ 2/28
+        # # brunch model
+        # brunch_table = pd.DataFrame()
+        # brunch_notice = ['@brunch_153','@brunch_151']
+        # brunch_table['article_id'] = brunch_notice
 
-        # 가장 많이 읽은 article_id, 마지막 모델에 사용하기 위하여 만듬
-        most_read_article = most_read_article['article_id'].value_counts().reset_index()
-        most_read_article.columns = ['article_id','value_counts']
+        # # weekly model
+        # weekly_table = weekly_magazine_series(read_rowwise, 
+        #                                       metadata, 
+        #                                       predict_following, 
+        #                                       meta_period=config.weekly_meta_period, 
+        #                                       read_period=config.weekly_read_period, 
+        #                                       series_count=config.weekly_series_count) # clear
+        # weekly_table['article_number'] = weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+        # # series model
+        # series_table = magazine_series(read_rowwise, 
+        #                                metadata, 
+        #                                predict_following,
+        #                                meta_period=config.series_meta_period, 
+        #                                read_period=config.series_read_period, 
+        #                                series_count=config.series_series_count) # clear
+        # series_table['article_number'] = series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+        # # dont_following_magazine_series
+        # dont_series_table = dont_following_magazine_series(read_rowwise, 
+        #                                                    metadata, 
+        #                                                    predict_following,
+        #                                                    meta_period=config.dont_following_series_meta_period, 
+        #                                                    read_period=config.dont_following_series_read_period, 
+        #                                                    series_count=config.dont_following_series_series_count) 
+        # dont_series_table['article_number'] = dont_series_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+        # # dont_following_weekly_series
+        # dont_weekly_table = dont_following_weekly_series(read_rowwise, 
+        #                                                  metadata, 
+        #                                                  predict_following,
+        #                                                  meta_period=config.dont_following_weekly_meta_period, 
+        #                                                  read_period=config.dont_following_weekly_read_period, 
+        #                                                  series_count=config.dont_following_weekly_series_count) 
+        # dont_weekly_table['article_number'] = dont_weekly_table['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
 
-        # 구독작가에 맞는 추천을 하기 위하여 사용
-        # cumcount는 그룹을 나타내주는데 가장 많이 읽은 article부터 작가의 rank를 나타냄
-        most_read_article['author_id'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[0])
-        most_read_article['article_number'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+        # # best model
+        # most_read_article = read_preprocessing(read_rowwise, metadata ,read_period=config.best_read_period) # 2/22 ~ 2/28
 
-        most_read_article = most_read_article.sort_values(by=['value_counts','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
-        most_read_article['rank'] = most_read_article.groupby(['author_id'])['author_id'].agg({'cumcount'}).reset_index(drop=True)
-        most_read_article_author_rank = most_read_article.copy()
+        # # 가장 많이 읽은 article_id, 마지막 모델에 사용하기 위하여 만듬
+        # most_read_article = most_read_article['article_id'].value_counts().reset_index()
+        # most_read_article.columns = ['article_id','value_counts']
+
+        # # 구독작가에 맞는 추천을 하기 위하여 사용
+        # # cumcount는 그룹을 나타내주는데 가장 많이 읽은 article부터 작가의 rank를 나타냄
+        # most_read_article['author_id'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[0])
+        # most_read_article['article_number'] = most_read_article['article_id'].astype(str).apply(lambda x : x.split('_')[1]).astype(int)
+
+        # most_read_article = most_read_article.sort_values(by=['value_counts','article_number'],ascending=[False,False] ,kind='mergesort').reset_index(drop=True)
+        # most_read_article['rank'] = most_read_article.groupby(['author_id'])['author_id'].agg({'cumcount'}).reset_index(drop=True)
+        # most_read_article_author_rank = most_read_article.copy()
 
 
-        # following model
-        following_favor_many_read = following_favor_frame(read_rowwise, 
-                                                          metadata, 
-                                                          predict_following, 
-                                                          most_read_article_author_rank, 
-                                                          correction_type=0,
-                                                          meta_period=config.following_meta_period,
-                                                          read_period=config.following_read_period,
-                                                          favor_cutoff=config.following_favor_cutoff) # clear
+        # # following model
+        # following_favor_many_read = following_favor_frame(read_rowwise, 
+        #                                                   metadata, 
+        #                                                   predict_following, 
+        #                                                   most_read_article_author_rank, 
+        #                                                   correction_type=0,
+        #                                                   meta_period=config.following_meta_period,
+        #                                                   read_period=config.following_read_period,
+        #                                                   favor_cutoff=config.following_favor_cutoff) # clear
 
-        # following model
-        following_favor_repeat_read = following_favor_frame(read_rowwise, 
-                                                            metadata, 
-                                                            predict_following, 
-                                                            most_read_article_author_rank, 
-                                                            correction_type=1,
-                                                            meta_period=config.following_meta_period,
-                                                            read_period=config.following_read_period,
-                                                            favor_cutoff=config.following_favor_cutoff) # clear
+        # # following model
+        # following_favor_repeat_read = following_favor_frame(read_rowwise, 
+        #                                                     metadata, 
+        #                                                     predict_following, 
+        #                                                     most_read_article_author_rank, 
+        #                                                     correction_type=1,
+        #                                                     meta_period=config.following_meta_period,
+        #                                                     read_period=config.following_read_period,
+        #                                                     favor_cutoff=config.following_favor_cutoff) # clear
 
-        # variable model
-        read_temp = read_preprocessing(read_rowwise, metadata , read_period=config.variable_user_model_read_period)
-        variable_user = get_how_many_read_by_variableuser_article(read_temp) # clear
+        # # ClEAR
+
+
+        # # variable model
+        # read_temp = read_preprocessing(read_rowwise, metadata , read_period=config.variable_user_model_read_period)
+        # variable_user = get_how_many_read_by_variableuser_article(read_temp) # clear
 
         # user correction model
         read_user_correction, dontread_user_correction  = count_correlction_read_favor(read_rowwise, 
@@ -165,6 +172,8 @@ class RecommendCLI():
                            most_read_article_model]
         brunch_recommend_dontread.recommend(read_model_list)
 
+        
+
         data_frame_up = brunch_recommend_read.make_result_frame()
         data_frame_down = brunch_recommend_dontread.make_result_frame()
         data_frame = pd.concat([data_frame_up,data_frame_down],axis=0)
@@ -173,5 +182,5 @@ class RecommendCLI():
         sub = user_id_frame.merge(data_frame, on='user_id', how='left')
         sub.to_csv(submission_file, index=False, header=False, sep=' ')
 
-#if __name__ == '__main__':
-#    fire.Fire(RecommendCLI)
+if __name__ == '__main__':
+   fire.Fire(RecommendCLI)
